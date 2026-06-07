@@ -4,1353 +4,219 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="KIZASHI">
-<meta name="description" content="記念日リマインダー & クーポン管理アプリ">
-<meta name="theme-color" content="#007aff">
-<title>KIZASHI</title>
+<meta name="apple-mobile-web-app-title" content="KIZASHI管理">
+<meta name="theme-color" content="#1c1c4e">
+<title>KIZASHI 管理画面</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
-
 :root {
-  --blue: #007aff;
-  --blue-dark: #0055cc;
-  --blue-light: #e8f2ff;
-  --blue-pale: #f0f6ff;
-  --bg: #f2f2f7;
-  --surface: #ffffff;
-  --ink: #1c1c1e;
-  --ink-secondary: #3c3c43;
-  --ink-tertiary: #8e8e93;
-  --separator: #c6c6c8;
-  --separator-light: #e5e5ea;
-  --red: #ff3b30;
-  --orange: #ff9500;
-  --green: #34c759;
-  --teal: #5ac8fa;
-  --purple: #af52de;
-  --pink: #ff2d55;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 2px 12px rgba(0,0,0,0.1);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
-  --radius: 12px;
-  --radius-sm: 8px;
+  --navy: #1c1c4e; --navy-light: #2d2d6e; --blue: #007aff; --blue-light: #e8f2ff;
+  --bg: #f2f2f7; --surface: #ffffff; --ink: #1c1c1e; --ink-secondary: #3c3c43;
+  --ink-tertiary: #8e8e93; --separator-light: #e5e5ea; --red: #ff3b30; --orange: #ff9500;
+  --green: #34c759; --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 2px 12px rgba(0,0,0,0.1);
+  --radius: 12px; --radius-sm: 8px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-html, body {
-  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
-  min-height: 100vh;
-}
-
+html, body { font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; min-height: 100vh; }
 button { cursor: pointer; font-family: inherit; border: none; background: none; }
 input, textarea, select { font-family: inherit; }
-
-.app {
-  max-width: 430px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: var(--bg);
-  position: relative;
-  padding-bottom: 80px;
-}
-
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg); position: relative; padding-bottom: 80px; }
 .view { display: none; }
 .view.active { display: block; }
-
-/* ========== ヘッダー ========== */
-.header {
-  background: var(--surface);
-  padding: 16px 20px 12px;
-  border-bottom: 0.5px solid var(--separator-light);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.header h1 {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.header-sub {
-  font-size: 13px;
-  color: var(--ink-tertiary);
-}
-
-.header-user {
-  font-size: 12px;
-  background: var(--blue-light);
-  color: var(--blue);
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.header-back {
-  font-size: 17px;
-  color: var(--blue);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-/* ========== カード ========== */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  margin: 12px 16px;
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  animation: fadeIn 0.3s ease;
-}
-
-.card-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-
-.info-banner {
-  background: var(--blue-pale);
-  border: 1px solid rgba(0,122,255,0.12);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  font-size: 12px;
-  color: var(--blue-dark);
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-
-/* ========== フォーム ========== */
-.form-group { margin-bottom: 16px; }
-
-.form-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-secondary);
-  display: block;
-  margin-bottom: 6px;
-}
-
-.form-label .req { color: var(--red); margin-left: 2px; }
-
-.form-hint {
-  font-size: 11px;
-  color: var(--ink-tertiary);
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-.field {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--bg);
-  border: 1px solid var(--separator-light);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  color: var(--ink);
-  transition: border-color 0.2s, box-shadow 0.2s;
-  -webkit-appearance: none;
-}
-
-.field:focus {
-  outline: none;
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
-  background: var(--surface);
-}
-
-.field::placeholder { color: var(--ink-tertiary); }
-
-select.field {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e93' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-}
-
-.date-row { display: flex; gap: 8px; }
-.date-row .field { flex: 1; }
-
-/* ========== 対象者選択 ========== */
-.target-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.target-chip {
-  padding: 8px 4px;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--separator-light);
-  background: var(--surface);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-secondary);
-  text-align: center;
-  transition: all 0.2s;
-}
-
-.target-chip.selected {
-  border-color: var(--blue);
-  background: var(--blue-light);
-  color: var(--blue);
-  font-weight: 600;
-}
-
-/* ========== リマインド設定 ========== */
-.remind-heading {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 16px 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.remind-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--separator-light);
-}
-
-.remind-row:last-child { border-bottom: none; }
-
-.remind-label { font-size: 15px; color: var(--ink); }
-.remind-desc { font-size: 12px; color: var(--ink-tertiary); margin-top: 2px; }
-
-.toggle { position: relative; width: 51px; height: 31px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-track {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--separator); border-radius: 16px;
-  transition: background 0.3s; cursor: pointer;
-}
-.toggle input:checked + .toggle-track { background: var(--green); }
-.toggle-track::after {
-  content: ''; position: absolute; width: 27px; height: 27px;
-  border-radius: 50%; background: white; top: 2px; left: 2px;
-  transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.toggle input:checked + .toggle-track::after { transform: translateX(20px); }
-
-/* ========== ボタン ========== */
-.btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: var(--radius);
-  font-size: 16px;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-.btn:active { opacity: 0.7; }
-.btn-primary { background: var(--blue); color: white; }
-.btn-outline { background: var(--surface); color: var(--blue); border: 1.5px solid var(--blue); }
-.btn-secondary { background: var(--bg); color: var(--ink-secondary); }
-.btn-green { background: var(--green); color: white; }
-
-/* ========== ログイン画面 ========== */
-.login-wrap {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 40px 24px;
-  background: linear-gradient(160deg, #007aff, #0055cc);
-}
-
-.login-logo {
-  text-align: center;
-  color: white;
-  margin-bottom: 40px;
-}
-
-.login-logo h1 {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.login-logo p {
-  font-size: 14px;
-  opacity: 0.85;
-  margin-top: 8px;
-}
-
-.login-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: var(--shadow-lg);
-}
-
-.login-card-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.login-card-sub {
-  font-size: 12px;
-  color: var(--ink-tertiary);
-  margin-bottom: 20px;
-}
-
-.sales-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1.5px solid var(--separator-light);
-  border-radius: var(--radius);
-  margin-bottom: 10px;
-  transition: all 0.2s;
-}
-
-.sales-option:active { background: var(--bg); }
-
-.sales-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
-  flex-shrink: 0;
-}
-
-.sales-info { flex: 1; }
-.sales-name { font-size: 15px; font-weight: 600; }
-.sales-meta { font-size: 12px; color: var(--ink-tertiary); margin-top: 2px; }
-.sales-arrow { color: var(--ink-tertiary); font-size: 20px; }
-
-/* ========== アラートカード ========== */
-.alert-card {
-  background: linear-gradient(135deg, var(--blue-pale), var(--blue-light));
-  border: 1px solid rgba(0, 122, 255, 0.15);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-}
-.alert-emoji { font-size: 32px; margin-bottom: 8px; }
-.alert-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-.alert-body { font-size: 13px; color: var(--ink-secondary); line-height: 1.5; }
-.alert-action {
-  margin-top: 12px;
-  background: var(--blue);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  display: inline-block;
-}
-
-/* ========== LINE通知の見た目 ========== */
-.line-notify {
-  background: #06c755;
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  color: white;
-}
-.line-notify-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  opacity: 0.95;
-}
-.line-notify-body {
-  background: rgba(255,255,255,0.15);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* ========== エリアタブ ========== */
-.area-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.area-tab {
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  border: 1.5px solid var(--separator-light);
-  color: var(--ink-secondary);
-  background: var(--surface);
-  transition: all 0.2s;
-}
-.area-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
-
-/* ========== クーポンカード ========== */
-.coupon-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow-sm);
-  border-left: 4px solid var(--blue);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.coupon-card:active { transform: scale(0.98); }
-.coupon-card.selected {
-  border-left-color: var(--green);
-  box-shadow: 0 0 0 2px var(--green), var(--shadow-md);
-}
-.coupon-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-.coupon-icon {
-  width: 44px; height: 44px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.coupon-icon.food { background: rgba(255, 149, 0, 0.12); }
-.coupon-icon.photo { background: rgba(90, 200, 250, 0.12); }
-.coupon-icon.gift { background: rgba(255, 45, 85, 0.12); }
-.coupon-icon.stay { background: rgba(175, 82, 222, 0.12); }
-.coupon-icon.other { background: rgba(142, 142, 147, 0.12); }
-.coupon-name { font-size: 15px; font-weight: 600; color: var(--ink); }
-.coupon-cat { font-size: 11px; color: var(--ink-tertiary); margin-top: 2px; }
-.coupon-deal { font-size: 14px; color: var(--blue-dark); font-weight: 500; margin-bottom: 4px; }
-.coupon-note { font-size: 12px; color: var(--ink-tertiary); line-height: 1.4; }
-.coupon-expiry { font-size: 11px; color: var(--ink-tertiary); margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--separator-light); }
-
-/* ========== メッセージ・AI ========== */
-.ai-suggest {
-  background: linear-gradient(135deg, #fff8f0, #fff3e6);
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.ai-suggest.hidden { display: none; }
-.ai-label { font-size: 11px; font-weight: 700; color: var(--orange); letter-spacing: 0.5px; margin-bottom: 8px; }
-.ai-text {
-  font-size: 14px; color: var(--ink); line-height: 1.6;
-  padding: 10px 12px; background: white; border-radius: var(--radius-sm);
-  border-left: 3px solid var(--orange); margin-bottom: 12px;
-}
-.ai-actions { display: flex; gap: 8px; }
-.ai-btn { flex: 1; padding: 10px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; text-align: center; }
-.ai-btn.ok { background: var(--green); color: white; }
-.ai-btn.clear { background: var(--bg); color: var(--ink-tertiary); border: 1px solid var(--separator-light); }
-textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
-.char-count { text-align: right; font-size: 12px; color: var(--ink-tertiary); margin-top: 4px; }
-
-/* ========== リンク発行 ========== */
-.link-box {
-  background: var(--bg);
-  border: 1px dashed var(--separator);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  font-size: 13px;
-  color: var(--ink-secondary);
-  word-break: break-all;
-  margin-bottom: 12px;
-  font-family: monospace;
-}
-.copy-status {
-  text-align: center;
-  font-size: 13px;
-  color: var(--green);
-  font-weight: 600;
-  margin-top: 8px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.copy-status.show { opacity: 1; }
-.send-options { display: flex; gap: 8px; margin-top: 12px; }
-.send-opt {
-  flex: 1; padding: 12px; border-radius: var(--radius-sm);
-  text-align: center; font-size: 13px; font-weight: 600;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-}
-.send-opt.line { background: #06c755; color: white; }
-.send-opt.sms { background: var(--blue); color: white; }
-.send-opt .icon { font-size: 20px; }
-
-/* ========== 顧客受取（ギフトカード） ========== */
-.gift-card {
-  background: linear-gradient(145deg, #1a1a2e, #16213e);
-  border-radius: 16px;
-  padding: 28px 24px;
-  color: white;
-  text-align: center;
-  margin: 16px;
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
-}
-.gift-card::before {
-  content: '';
-  position: absolute; top: -50%; left: -50%;
-  width: 200%; height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
-  pointer-events: none;
-}
-.gift-emoji { font-size: 36px; margin-bottom: 12px; }
-.gift-store { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-.gift-deal { font-size: 16px; color: #ffd700; font-weight: 500; margin-bottom: 16px; }
-.gift-message {
-  font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.6;
-  padding: 12px; background: rgba(255,255,255,0.08);
-  border-radius: var(--radius-sm); margin-bottom: 16px; text-align: left;
-}
-.gift-expiry { font-size: 11px; color: rgba(255,255,255,0.5); }
-
-/* ========== 完了スワイプ ========== */
-.swipe-track {
-  position: relative;
-  background: var(--bg);
-  border-radius: 30px;
-  height: 56px;
-  margin: 16px;
-  overflow: hidden;
-  border: 1px solid var(--separator-light);
-}
-.swipe-fill {
-  position: absolute; top: 0; left: 0; bottom: 0;
-  width: 56px;
-  background: var(--green);
-  border-radius: 30px;
-  transition: width 0.1s;
-}
-.swipe-thumb {
-  position: absolute; top: 4px; left: 4px;
-  width: 48px; height: 48px;
-  background: white;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-  box-shadow: var(--shadow-md);
-  z-index: 2;
-  transition: left 0.1s;
-}
-.swipe-label {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 600; color: var(--ink-tertiary);
-  z-index: 1;
-}
-.swipe-done .swipe-label { color: white; }
-
-.used-stamp {
-  text-align: center;
-  padding: 40px 20px;
-}
-.used-stamp .stamp {
-  display: inline-block;
-  border: 4px solid var(--red);
-  color: var(--red);
-  font-size: 28px;
-  font-weight: 700;
-  padding: 12px 32px;
-  border-radius: 12px;
-  transform: rotate(-8deg);
-  letter-spacing: 2px;
-}
-
-/* ========== 管理画面 ========== */
-.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.kpi-item { text-align: center; padding: 12px 8px; background: var(--bg); border-radius: var(--radius-sm); }
-.kpi-num { font-size: 24px; font-weight: 700; color: var(--blue); }
-.kpi-label { font-size: 11px; color: var(--ink-tertiary); margin-top: 4px; }
-
-.subtab-row {
-  display: flex;
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-  margin-bottom: 16px;
-}
-.subtab {
-  flex: 1; padding: 8px; text-align: center;
-  font-size: 13px; font-weight: 600; color: var(--ink-tertiary);
-  border-radius: 6px; transition: all 0.2s;
-}
-.subtab.active { background: white; color: var(--blue); box-shadow: var(--shadow-sm); }
-
-.admin-panel { display: none; }
-.admin-panel.active { display: block; }
-
-.list-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 0; border-bottom: 0.5px solid var(--separator-light);
-}
+.header { background: var(--navy); color: white; padding: 16px 20px 14px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; }
+.header h1 { font-size: 22px; font-weight: 700; }
+.header-tag { font-size: 11px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px; }
+.header-sub { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+.card { background: var(--surface); border-radius: var(--radius); margin: 12px 16px; padding: 16px; box-shadow: var(--shadow-sm); animation: fadeIn 0.3s ease; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--ink-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.info-banner { background: #fff8f0; border: 1px solid rgba(255,149,0,0.2); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; color: #8a5a00; line-height: 1.5; margin-bottom: 12px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.kpi-item { padding: 16px; background: var(--bg); border-radius: var(--radius-sm); }
+.kpi-num { font-size: 28px; font-weight: 700; color: var(--navy); }
+.kpi-num span { font-size: 14px; font-weight: 500; color: var(--ink-tertiary); }
+.kpi-label { font-size: 12px; color: var(--ink-tertiary); margin-top: 4px; }
+.subtab-row { display: flex; background: var(--bg); border-radius: var(--radius-sm); padding: 3px; margin: 12px 16px; }
+.subtab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; color: var(--ink-tertiary); border-radius: 6px; transition: all 0.2s; }
+.subtab.active { background: white; color: var(--navy); box-shadow: var(--shadow-sm); }
+.panel { display: none; }
+.panel.active { display: block; }
+.list-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 0.5px solid var(--separator-light); }
 .list-item:last-child { border-bottom: none; }
-.list-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
+.list-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
 .list-info { flex: 1; }
 .list-name { font-size: 15px; font-weight: 600; }
 .list-detail { font-size: 12px; color: var(--ink-tertiary); margin-top: 2px; }
-.list-badge { font-size: 11px; padding: 3px 8px; border-radius: 10px; background: var(--blue-light); color: var(--blue); font-weight: 500; }
-
 .rate-bar-wrap { margin-top: 6px; }
 .rate-bar-bg { background: var(--separator-light); border-radius: 4px; height: 6px; overflow: hidden; }
 .rate-bar-fill { background: var(--green); height: 100%; border-radius: 4px; }
-
-/* ========== タブバー ========== */
-.tab-bar {
-  position: fixed; bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid var(--separator-light);
-  display: flex; z-index: 200;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-.tab-bar.hidden { display: none; }
-.tab-item {
-  flex: 1; padding: 8px 0 6px;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  color: var(--ink-tertiary); font-size: 10px; font-weight: 500;
-  transition: color 0.2s;
-}
-.tab-item.active { color: var(--blue); }
+.list-badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 600; flex-shrink: 0; }
+.list-badge.green { background: rgba(52,199,89,0.12); color: var(--green); }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--ink-secondary); display: block; margin-bottom: 6px; }
+.field { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--separator-light); border-radius: var(--radius-sm); font-size: 16px; color: var(--ink); -webkit-appearance: none; }
+.field:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); background: var(--surface); }
+select.field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e93' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+.btn { width: 100%; padding: 13px; border-radius: var(--radius); font-size: 15px; font-weight: 600; transition: opacity 0.2s; }
+.btn:active { opacity: 0.7; }
+.btn-navy { background: var(--navy); color: white; }
+.tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--separator-light); display: flex; z-index: 200; padding-bottom: env(safe-area-inset-bottom); }
+.tab-item { flex: 1; padding: 8px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink-tertiary); font-size: 10px; font-weight: 500; transition: color 0.2s; }
+.tab-item.active { color: var(--navy); }
 .tab-icon { font-size: 22px; height: 28px; display: flex; align-items: center; justify-content: center; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-
 <div class="app">
 
-<!-- ================================================ -->
-<!-- VIEW 0: ログイン（営業マンの部屋選択） -->
-<!-- ================================================ -->
-<section class="view active" id="view-login">
-  <div class="login-wrap">
-    <div class="login-logo">
-      <h1>KIZASHI</h1>
-      <p>記念日リマインダー & クーポン</p>
-    </div>
-    <div class="login-card">
-      <div class="login-card-title">営業マンを選択</div>
-      <div class="login-card-sub">各営業マンのデータは完全に独立しています</div>
-
-      <div class="sales-option" onclick="login('yamada')">
-        <div class="sales-avatar" style="background:#007aff;">山</div>
-        <div class="sales-info">
-          <div class="sales-name">山田 典広</div>
-          <div class="sales-meta">顧客 12名 · ID形式: 自由</div>
-        </div>
-        <span class="sales-arrow">›</span>
-      </div>
-
-      <div class="sales-option" onclick="login('sato')">
-        <div class="sales-avatar" style="background:#34c759;">佐</div>
-        <div class="sales-info">
-          <div class="sales-name">佐藤 健一</div>
-          <div class="sales-meta">顧客 8名 · ID形式: 自由</div>
-        </div>
-        <span class="sales-arrow">›</span>
-      </div>
-
-      <div class="sales-option" onclick="login('suzuki')">
-        <div class="sales-avatar" style="background:#ff9500;">鈴</div>
-        <div class="sales-info">
-          <div class="sales-name">鈴木 美咲</div>
-          <div class="sales-meta">顧客 5名 · ID形式: 自由</div>
-        </div>
-        <span class="sales-arrow">›</span>
-      </div>
-
-      <div class="info-banner" style="margin-top:16px; margin-bottom:0;">
-        💡 各営業マンは自分の顧客しか見られません。顧客IDの付け方も営業マンごとに自由です（例：山田さんは「001」、佐藤さんは「A-001」など）。
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 1: 顧客入力画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-input">
+<section class="view active" id="view-dashboard">
   <div class="header">
-    <div class="header-top">
-      <h1>KIZASHI</h1>
-      <span class="header-user" id="userBadge">山田</span>
-    </div>
-    <div class="header-sub">記念日情報を登録（個人情報は入力しません）</div>
-  </div>
-
-  <div class="card">
-    <div class="info-banner">
-      🔒 入力するのは「顧客ID」と「生年月日」だけ。氏名・住所・連絡先はシステムに保存されません。顧客IDが誰かは営業マンご自身で管理します。
-    </div>
-
-    <div class="card-title">顧客情報</div>
-
-    <div class="form-group">
-      <label class="form-label">顧客ID <span class="req">*</span></label>
-      <input type="text" class="field" id="custId" placeholder="例：001（あなたの管理番号）">
-      <div class="form-hint">※ 個人名や連想できる文字は使わないでください</div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">対象</label>
-      <div class="target-grid" id="targetGrid">
-        <button class="target-chip selected" onclick="selectTarget(this)">本人</button>
-        <button class="target-chip" onclick="selectTarget(this)">配偶者</button>
-        <button class="target-chip" onclick="selectTarget(this)">長男</button>
-        <button class="target-chip" onclick="selectTarget(this)">長女</button>
-        <button class="target-chip" onclick="selectTarget(this)">次男</button>
-        <button class="target-chip" onclick="selectTarget(this)">次女</button>
-        <button class="target-chip" onclick="selectTarget(this)">父</button>
-        <button class="target-chip" onclick="selectTarget(this)">母</button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">生年月日 <span class="req">*</span></label>
-      <div class="date-row">
-        <select class="field" id="birthYear"></select>
-        <select class="field" id="birthMonth"></select>
-        <select class="field" id="birthDay"></select>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">リマインド設定</div>
-
-    <div class="remind-heading"><span>🔄</span> 継続記念日（毎年）</div>
-    <div class="remind-row">
-      <div class="remind-label">誕生日</div>
-      <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
-    </div>
-    <div class="remind-row">
-      <div class="remind-label">結婚記念日</div>
-      <label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label>
-    </div>
-    <div class="remind-row">
-      <div class="remind-label">開業記念日</div>
-      <label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label>
-    </div>
-
-    <div class="remind-heading"><span>🎓</span> 単発記念日（自動計算）</div>
-    <div class="remind-row">
-      <div>
-        <div class="remind-label">入学・卒業</div>
-        <div class="remind-desc">生年月日から自動判定</div>
-      </div>
-      <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
-    </div>
-    <div class="remind-row">
-      <div>
-        <div class="remind-label">成人</div>
-        <div class="remind-desc">18歳到達時に通知</div>
-      </div>
-      <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
-    </div>
-  </div>
-
-  <div style="padding: 0 16px; margin-bottom: 16px;">
-    <button class="btn btn-primary" onclick="registerCustomer()">登録する</button>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 2: リマインド一覧画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-remind">
-  <div class="header">
-    <div class="header-top">
-      <h1>本日のリマインド</h1>
-      <span class="header-user" id="userBadge2">山田</span>
-    </div>
-    <div class="header-sub">公式LINEに届いた通知です</div>
-  </div>
-
-  <div style="padding: 12px 16px 0;">
-    <div class="line-notify">
-      <div class="line-notify-head">💬 KIZASHI公式LINE · 今朝 8:00</div>
-      <div class="line-notify-body">
-        🎂 本日、記念日のお客様が <strong>2名</strong> いらっしゃいます。<br>
-        アプリを開いてクーポンをお届けしましょう。
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">リマインド（2件）</div>
-
-    <div class="alert-card">
-      <div class="alert-emoji">🎂</div>
-      <div class="alert-title">顧客ID: 001（本人）</div>
-      <div class="alert-body">本日 <strong>30歳のお誕生日</strong> です</div>
-      <span class="alert-action" onclick="startCouponFlow('001', '🎂 30歳のお誕生日')">クーポンを選ぶ →</span>
-    </div>
-
-    <div class="alert-card">
-      <div class="alert-emoji">🎒</div>
-      <div class="alert-title">顧客ID: 007（長男）</div>
-      <div class="alert-body">来月 <strong>小学校ご入学</strong> を迎えます</div>
-      <span class="alert-action" onclick="startCouponFlow('007', '🎒 小学校ご入学')">クーポンを選ぶ →</span>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 3: クーポン選択画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-coupon">
-  <div class="header">
-    <button class="header-back" onclick="showView('remind')">‹ リマインドに戻る</button>
-    <h1>クーポンを選ぶ</h1>
-    <div class="header-sub" id="couponFor">顧客ID: 001 · 🎂 30歳のお誕生日</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">利用エリアを選択</div>
-    <div class="area-tabs" id="areaTabs">
-      <button class="area-tab active" onclick="selectArea(this, 'all')">すべて</button>
-      <button class="area-tab" onclick="selectArea(this, 'owari')">名古屋・尾張</button>
-      <button class="area-tab" onclick="selectArea(this, 'mikawa')">三河</button>
-      <button class="area-tab" onclick="selectArea(this, 'chita')">知多</button>
-    </div>
-
-    <div class="card-title">おすすめクーポン — タップして選択</div>
-    <div id="couponList"></div>
-  </div>
-
-  <div style="padding: 0 16px; margin-bottom: 16px;">
-    <button class="btn btn-primary" id="toMsgBtn" onclick="showView('message')" style="display:none;">メッセージを添えて進む →</button>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 4: メッセージ入力画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-message">
-  <div class="header">
-    <button class="header-back" onclick="showView('coupon')">‹ クーポン選択に戻る</button>
-    <h1>メッセージを添える</h1>
-    <div class="header-sub">お客様への一言（自筆）</div>
-  </div>
-
-  <div class="card">
-    <div class="alert-card" style="margin-bottom: 0;">
-      <div class="alert-title" id="msgCouponName">名駅イタリアン FESTA</div>
-      <div class="alert-body" id="msgCouponDeal">お祝いデザートプレート 無料プレゼント</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="ai-suggest" id="aiSuggest">
-      <div class="ai-label">💡 AIおすすめメッセージ</div>
-      <div class="ai-text" id="aiText">お誕生日おめでとうございます。素敵な記念日に、ぜひこちらのお店でゆっくりお過ごしください。心ばかりですがクーポンをお贈りします。</div>
-      <div class="ai-actions">
-        <button class="ai-btn ok" onclick="acceptAI()">✓ このまま使う</button>
-        <button class="ai-btn clear" onclick="clearAI()">✕ 自分で書く</button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">あなたの言葉で…</label>
-      <textarea class="field" id="msgText" placeholder="お客様への一言を入力..." oninput="countChars()"></textarea>
-      <div class="char-count"><span id="charCnt">0</span>/200</div>
-    </div>
-
-    <button class="btn btn-primary" onclick="issueLink()">クーポンのリンクを発行</button>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 5: リンク発行画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-link">
-  <div class="header">
-    <h1>リンクを発行しました</h1>
-    <div class="header-sub">お客様にLINE/SMSで送ってください</div>
-  </div>
-
-  <div class="card">
-    <div class="info-banner">
-      ✅ 顧客専用リンクを作成しました。下のリンクをコピーして、お客様にLINEまたはSMSで送ってください。連絡先はアプリに保存されません。
-    </div>
-
-    <div class="card-title">顧客専用リンク</div>
-    <div class="link-box" id="linkBox">https://kizashi.app/r/x7k9m2p4q8</div>
-    <button class="btn btn-outline" onclick="copyLink()">📋 リンクをコピー</button>
-    <div class="copy-status" id="copyStatus">✓ コピーしました</div>
-
-    <div class="send-options">
-      <div class="send-opt line" onclick="copyAndOpen('line')">
-        <span class="icon">💬</span>
-        LINEで送る
-      </div>
-      <div class="send-opt sms" onclick="copyAndOpen('sms')">
-        <span class="icon">✉️</span>
-        SMSで送る
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">プレビュー（お客様に届く画面）</div>
-    <p style="font-size:13px; color:var(--ink-tertiary); margin-bottom:12px;">お客様がリンクを開くと、こう表示されます ↓</p>
-    <button class="btn btn-secondary" onclick="showView('redeem')">受取画面を確認する</button>
-  </div>
-
-  <div style="padding: 0 16px; margin-bottom: 16px;">
-    <button class="btn btn-primary" onclick="finishAndHome()">完了してホームに戻る</button>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 6: 顧客受取画面（リンクで開く想定） -->
-<!-- ================================================ -->
-<section class="view" id="view-redeem">
-  <div class="header">
-    <div class="header-top">
-      <h1>KIZASHI</h1>
-    </div>
-    <div class="header-sub">あなたへの特別なクーポンです 🎁</div>
-  </div>
-
-  <div id="redeemActive">
-    <div class="gift-card">
-      <div class="gift-emoji">🎂</div>
-      <div class="gift-store" id="giftStore">名駅イタリアン FESTA</div>
-      <div class="gift-deal" id="giftDeal">お祝いデザートプレート 無料プレゼント</div>
-      <div class="gift-message" id="giftMsg">お誕生日おめでとうございます。素敵な記念日に、ぜひこちらのお店でゆっくりお過ごしください。</div>
-      <div class="gift-expiry">有効期限: 2026年6月30日</div>
-    </div>
-
-    <div class="card" style="text-align:center; padding: 12px 16px;">
-      <p style="font-size:13px; color:var(--ink-secondary);">▼ ご利用時は店員さんにこの画面を見せて、下のバーをスワイプしてください</p>
-    </div>
-
-    <div class="swipe-track" id="swipeTrack">
-      <div class="swipe-fill" id="swipeFill"></div>
-      <div class="swipe-thumb" id="swipeThumb">→</div>
-      <div class="swipe-label" id="swipeLabel">スワイプして利用</div>
-    </div>
-    <p style="text-align:center; font-size:11px; color:var(--ink-tertiary); margin-bottom:16px;">※ 一度利用すると再使用できません</p>
-  </div>
-
-  <div id="redeemUsed" style="display:none;">
-    <div class="used-stamp">
-      <div class="stamp">使用済</div>
-      <p style="margin-top:20px; font-size:14px; color:var(--ink-secondary);">クーポンをご利用いただきました</p>
-      <p style="font-size:12px; color:var(--ink-tertiary); margin-top:8px;">2026年6月6日 利用 · 名駅イタリアン FESTA</p>
-    </div>
-    <div style="padding: 0 16px;">
-      <button class="btn btn-secondary" onclick="resetRedeem()">デモを最初に戻す</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================ -->
-<!-- VIEW 7: 管理画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-admin">
-  <div class="header">
-    <div class="header-top">
-      <h1>KIZASHI 管理</h1>
-      <span style="font-size:12px; color:var(--ink-tertiary);">🔐 運営</span>
-    </div>
+    <div class="header-top"><h1>KIZASHI 管理</h1><span class="header-tag">🔐 運営</span></div>
     <div class="header-sub">名古屋・岡崎パイロット</div>
   </div>
-
   <div class="card">
+    <div class="info-banner">ℹ️ 管理画面では、顧客の個人情報は扱いません。クーポンと営業マンの管理、利用状況の数字だけを確認します。</div>
+    <div class="card-title">クーポン利用状況</div>
     <div class="kpi-grid">
-      <div class="kpi-item"><div class="kpi-num">9</div><div class="kpi-label">🏪 加盟店</div></div>
-      <div class="kpi-item"><div class="kpi-num">3</div><div class="kpi-label">👥 営業マン</div></div>
-      <div class="kpi-item"><div class="kpi-num">23</div><div class="kpi-label">📊 今月利用</div></div>
+      <div class="kpi-item"><div class="kpi-num">25</div><div class="kpi-label">🎫 発行済みクーポン</div></div>
+      <div class="kpi-item"><div class="kpi-num">18</div><div class="kpi-label">✅ 使用済み</div></div>
+      <div class="kpi-item"><div class="kpi-num">7</div><div class="kpi-label">⏳ 未使用</div></div>
+      <div class="kpi-item"><div class="kpi-num">72<span>%</span></div><div class="kpi-label">📊 使用率</div></div>
     </div>
   </div>
-
   <div class="card">
-    <div class="subtab-row">
-      <div class="subtab active" onclick="adminTab(this, 'sales')">営業マン</div>
-      <div class="subtab" onclick="adminTab(this, 'stores')">加盟店・クーポン</div>
-    </div>
-
-    <!-- 営業マン管理 -->
-    <div class="admin-panel active" id="panel-sales">
-      <div class="card-title">稼働率（クーポン使用率）</div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#007aff22;">山</div>
-        <div class="list-info">
-          <div class="list-name">山田 典広</div>
-          <div class="list-detail">今月 12件発行 · 9件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:75%;"></div></div></div>
-        </div>
-        <span class="list-badge">75%</span>
-      </div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#34c75922;">佐</div>
-        <div class="list-info">
-          <div class="list-name">佐藤 健一</div>
-          <div class="list-detail">今月 8件発行 · 5件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:63%;"></div></div></div>
-        </div>
-        <span class="list-badge">63%</span>
-      </div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#ff950022;">鈴</div>
-        <div class="list-info">
-          <div class="list-name">鈴木 美咲</div>
-          <div class="list-detail">今月 5件発行 · 4件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:80%;"></div></div></div>
-        </div>
-        <span class="list-badge">80%</span>
-      </div>
-
-      <button class="btn btn-outline" style="margin-top:16px;" onclick="alert('営業マン追加フォーム（最大3名）')">+ 営業マンを追加</button>
-    </div>
-
-    <!-- 加盟店・クーポン管理 -->
-    <div class="admin-panel" id="panel-stores">
-      <div class="card-title">店舗ごとの使用率</div>
-      <div id="adminStoreList"></div>
-      <button class="btn btn-outline" style="margin-top:16px;" onclick="alert('店舗・クーポン登録フォーム')">+ 加盟店を登録</button>
+    <div class="card-title">登録状況</div>
+    <div class="kpi-grid">
+      <div class="kpi-item"><div class="kpi-num">9</div><div class="kpi-label">🏪 加盟店</div></div>
+      <div class="kpi-item"><div class="kpi-num">1</div><div class="kpi-label">👥 営業マン</div></div>
     </div>
   </div>
 </section>
 
-<!-- ========== タブバー ========== -->
-<nav class="tab-bar hidden" id="tabBar">
-  <button class="tab-item" onclick="showView('remind')" id="tab-remind">
-    <span class="tab-icon">🔔</span>リマインド
-  </button>
-  <button class="tab-item" onclick="showView('input')" id="tab-input">
-    <span class="tab-icon">📝</span>顧客登録
-  </button>
-  <button class="tab-item" onclick="showView('redeem')" id="tab-redeem">
-    <span class="tab-icon">🎁</span>受取画面
-  </button>
-  <button class="tab-item" onclick="showView('admin')" id="tab-admin">
-    <span class="tab-icon">⚙️</span>管理
-  </button>
-</nav>
+<section class="view" id="view-coupons">
+  <div class="header">
+    <div class="header-top"><h1>クーポン管理</h1><span class="header-tag">登録・使用率</span></div>
+    <div class="header-sub">発行できるクーポンの登録・編集と使用率</div>
+  </div>
+  <div class="subtab-row">
+    <div class="subtab active" onclick="couponTab(this,'list')">使用率一覧</div>
+    <div class="subtab" onclick="couponTab(this,'add')">新規登録</div>
+  </div>
+  <div class="panel active" id="panel-list">
+    <div class="card">
+      <div class="card-title">店舗ごとのクーポン使用率</div>
+      <div id="couponUsageList"></div>
+    </div>
+  </div>
+  <div class="panel" id="panel-add">
+    <div class="card">
+      <div class="card-title">加盟店・クーポンの登録</div>
+      <div class="form-group"><label class="form-label">店舗名</label><input type="text" class="field" id="storeName" placeholder="店舗名を入力"></div>
+      <div class="form-group"><label class="form-label">対象地区</label><select class="field" id="storeArea"><option value="owari">名古屋・尾張</option><option value="mikawa">三河</option><option value="chita">知多</option></select></div>
+      <div class="form-group"><label class="form-label">カテゴリ</label><select class="field" id="storeCat"><option value="food">🍽️ お食事</option><option value="photo">📸 記念撮影</option><option value="gift">💐 ギフト</option><option value="stay">🏨 宿泊・記念</option><option value="other">🎁 その他</option></select></div>
+      <div class="form-group"><label class="form-label">クーポン内容</label><input type="text" class="field" id="storeDeal" placeholder="例：10% OFF"></div>
+      <div class="form-group"><label class="form-label">利用条件（任意）</label><input type="text" class="field" id="storeNote" placeholder="例：2名様以上で利用可能"></div>
+      <div class="form-group"><label class="form-label">有効期限</label><input type="date" class="field" id="storeExpiry"></div>
+      <button class="btn btn-navy" onclick="addStore()">この店舗・クーポンを登録</button>
+    </div>
+  </div>
+</section>
 
+<section class="view" id="view-sales">
+  <div class="header">
+    <div class="header-top"><h1>営業マン管理</h1><span class="header-tag">登録・稼働率</span></div>
+    <div class="header-sub">営業マンの登録・編集と稼働率</div>
+  </div>
+  <div class="card">
+    <div class="card-title">営業マンの稼働率（クーポン使用率）</div>
+    <div class="list-item">
+      <div class="list-icon" style="background:#007aff22; color:#007aff;">山</div>
+      <div class="list-info">
+        <div class="list-name">山田 典広</div>
+        <div class="list-detail">25件発行 · 18件使用</div>
+        <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:72%;"></div></div></div>
+      </div>
+      <span class="list-badge green">72%</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">営業マンの登録</div>
+    <div class="info-banner" style="background:var(--blue-light); border-color:rgba(0,122,255,0.15); color:var(--blue);">💡 パイロットは最大3名まで。今は山田さん1名です。良くなったら追加します。</div>
+    <div class="form-group"><label class="form-label">営業マン名</label><input type="text" class="field" id="salesName" placeholder="氏名を入力"></div>
+    <div class="form-group"><label class="form-label">所属（任意）</label><input type="text" class="field" id="salesCompany" placeholder="例：◯◯保険代理店"></div>
+    <button class="btn btn-navy" onclick="addSales()">営業マンを追加</button>
+  </div>
+</section>
+
+<nav class="tab-bar">
+  <button class="tab-item active" onclick="showView('dashboard')" id="tab-dashboard"><span class="tab-icon">📊</span>ダッシュボード</button>
+  <button class="tab-item" onclick="showView('coupons')" id="tab-coupons"><span class="tab-icon">🎫</span>クーポン管理</button>
+  <button class="tab-item" onclick="showView('sales')" id="tab-sales"><span class="tab-icon">👥</span>営業マン管理</button>
+</nav>
 </div>
 
 <script>
-// ========== データ ==========
 const STORES = [
-  { name: '栄フォトスタジオ LUMIÈRE', area: 'owari', cat: 'photo', icon: '📸', deal: '入学記念撮影 10% OFF', note: '入学式前後2週間以内のご来店で適用', used: 4, issued: 5 },
-  { name: '名駅イタリアン FESTA', area: 'owari', cat: 'food', icon: '🍽️', deal: 'お祝いデザートプレート 無料プレゼント', note: '2名様以上のご予約でご利用可能', used: 6, issued: 8 },
-  { name: '大須 こども写真館 MO:RE', area: 'owari', cat: 'photo', icon: '🎎', deal: '七五三・入学セット 15% OFF', note: '3ポーズ以上のセットプランに適用', used: 3, issued: 4 },
-  { name: '豊橋フォトスタジオ BLOOM', area: 'mikawa', cat: 'photo', icon: '📸', deal: '入学記念撮影 10% OFF', note: '衣装レンタル込みプランに適用', used: 2, issued: 3 },
-  { name: '岡崎 お祝い懐石 花水木', area: 'mikawa', cat: 'food', icon: '🍱', deal: 'お祝いコース 5% OFF＋お子様ギフト', note: '4名様以上の個室ご利用で適用', used: 5, issued: 6 },
-  { name: '蒲郡シーサイドホテル CORAL', area: 'mikawa', cat: 'stay', icon: '🏨', deal: 'お祝いプラン 1室 3,000円 OFF', note: '2泊以上のご宿泊で利用可能', used: 1, issued: 2 },
-  { name: '半田 こどもスタジオ SAKURA', area: 'chita', cat: 'photo', icon: '🌸', deal: '入学記念撮影 10% OFF', note: 'アルバム制作セットプランに適用', used: 2, issued: 3 },
-  { name: '常滑 海辺のレストラン UMINECO', area: 'chita', cat: 'food', icon: '🌊', deal: 'お祝いランチコース 10% OFF', note: '平日ランチタイム限定・要予約', used: 4, issued: 5 },
-  { name: '武豊フラワーショップ HIBANA', area: 'chita', cat: 'gift', icon: '💐', deal: 'お祝い花束 500円 OFF', note: '3,000円以上のご注文で適用', used: 3, issued: 4 }
+  { name: '栄フォトスタジオ LUMIÈRE', area: 'owari', cat: 'photo', icon: '📸', deal: '入学記念撮影 10% OFF', issued: 4, used: 3 },
+  { name: '名駅イタリアン FESTA', area: 'owari', cat: 'food', icon: '🍽️', deal: 'お祝いデザートプレート 無料', issued: 6, used: 5 },
+  { name: '大須 こども写真館 MO:RE', area: 'owari', cat: 'photo', icon: '🎎', deal: '七五三・入学セット 15% OFF', issued: 3, used: 2 },
+  { name: '豊橋フォトスタジオ BLOOM', area: 'mikawa', cat: 'photo', icon: '📸', deal: '入学記念撮影 10% OFF', issued: 2, used: 1 },
+  { name: '岡崎 お祝い懐石 花水木', area: 'mikawa', cat: 'food', icon: '🍱', deal: 'お祝いコース 5% OFF', issued: 4, used: 3 },
+  { name: '蒲郡シーサイドホテル CORAL', area: 'mikawa', cat: 'stay', icon: '🏨', deal: 'お祝いプラン 3,000円 OFF', issued: 1, used: 1 },
+  { name: '半田 こどもスタジオ SAKURA', area: 'chita', cat: 'photo', icon: '🌸', deal: '入学記念撮影 10% OFF', issued: 2, used: 1 },
+  { name: '常滑 海辺のレストラン UMINECO', area: 'chita', cat: 'food', icon: '🌊', deal: 'お祝いランチ 10% OFF', issued: 2, used: 1 },
+  { name: '武豊フラワーショップ HIBANA', area: 'chita', cat: 'gift', icon: '💐', deal: 'お祝い花束 500円 OFF', issued: 1, used: 1 }
 ];
-
 const AREA_NAMES = { owari: '名古屋・尾張', mikawa: '三河', chita: '知多' };
-const CAT_CLASS = { food: 'food', photo: 'photo', gift: 'gift', stay: 'stay', other: 'other' };
-const SALES_NAMES = { yamada: '山田', sato: '佐藤', suzuki: '鈴木' };
+const ICONS = { food: '🍽️', photo: '📸', gift: '💐', stay: '🏨', other: '🎁' };
+const CAT_BG = { food: 'rgba(255,149,0,0.12)', photo: 'rgba(90,200,250,0.12)', gift: 'rgba(255,45,85,0.12)', stay: 'rgba(175,82,222,0.12)', other: 'rgba(142,142,147,0.12)' };
 
-let currentUser = 'yamada';
-let selectedCoupon = null;
-let currentArea = 'all';
-let currentCustomerId = '001';
-let currentEvent = '🎂 30歳のお誕生日';
-
-// ========== ログイン ==========
-function login(user) {
-  currentUser = user;
-  document.getElementById('userBadge').textContent = SALES_NAMES[user];
-  document.getElementById('userBadge2').textContent = SALES_NAMES[user];
-  document.getElementById('tabBar').classList.remove('hidden');
-  showView('remind');
-}
-
-// ========== 画面遷移 ==========
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(`view-${name}`).classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  const tab = document.getElementById(`tab-${name}`);
-  if (tab) tab.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
   window.scrollTo(0, 0);
 }
-
-// ========== 対象者選択 ==========
-function selectTarget(el) {
-  document.querySelectorAll('#targetGrid .target-chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-// ========== 生年月日プルダウン ==========
-function initDateSelects() {
-  const y = document.getElementById('birthYear');
-  const m = document.getElementById('birthMonth');
-  const d = document.getElementById('birthDay');
-  const now = new Date().getFullYear();
-  y.innerHTML = '<option value="">年</option>';
-  for (let i = now; i >= now - 100; i--) y.innerHTML += `<option value="${i}">${i}年</option>`;
-  m.innerHTML = '<option value="">月</option>';
-  for (let i = 1; i <= 12; i++) m.innerHTML += `<option value="${i}">${i}月</option>`;
-  d.innerHTML = '<option value="">日</option>';
-  for (let i = 1; i <= 31; i++) d.innerHTML += `<option value="${i}">${i}日</option>`;
-}
-
-// ========== 顧客登録 ==========
-function registerCustomer() {
-  const id = document.getElementById('custId').value;
-  const y = document.getElementById('birthYear').value;
-  if (!id || !y) { alert('顧客IDと生年月日を入力してください'); return; }
-  alert(`顧客ID「${id}」を登録しました\n（${SALES_NAMES[currentUser]}さんの部屋に保存）`);
-  document.getElementById('custId').value = '';
-  showView('remind');
-}
-
-// ========== クーポンフロー開始 ==========
-function startCouponFlow(custId, event) {
-  currentCustomerId = custId;
-  currentEvent = event;
-  selectedCoupon = null;
-  document.getElementById('couponFor').textContent = `顧客ID: ${custId} · ${event}`;
-  document.getElementById('toMsgBtn').style.display = 'none';
-  renderCoupons('all');
-  showView('coupon');
-}
-
-// ========== クーポン一覧 ==========
-function renderCoupons(area) {
-  currentArea = area;
-  const list = document.getElementById('couponList');
-  const filtered = area === 'all' ? STORES : STORES.filter(s => s.area === area);
-  list.innerHTML = filtered.map((s) => {
-    const idx = STORES.indexOf(s);
-    return `
-    <div class="coupon-card ${selectedCoupon === idx ? 'selected' : ''}" onclick="pickCoupon(${idx})">
-      <div class="coupon-header">
-        <div class="coupon-icon ${CAT_CLASS[s.cat]}">${s.icon}</div>
-        <div>
-          <div class="coupon-name">${s.name}</div>
-          <div class="coupon-cat">${AREA_NAMES[s.area]}</div>
-        </div>
-      </div>
-      <div class="coupon-deal">${s.deal}</div>
-      <div class="coupon-note">${s.note}</div>
-      <div class="coupon-expiry">有効期限: 2026年6月30日</div>
-    </div>`;
-  }).join('');
-}
-
-function selectArea(el, area) {
-  el.parentElement.querySelectorAll('.area-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  renderCoupons(area);
-}
-
-function pickCoupon(idx) {
-  selectedCoupon = idx;
-  renderCoupons(currentArea);
-  document.getElementById('toMsgBtn').style.display = 'block';
-  // メッセージ画面に反映
-  const s = STORES[idx];
-  document.getElementById('msgCouponName').textContent = s.name;
-  document.getElementById('msgCouponDeal').textContent = s.deal;
-}
-
-// ========== AIメッセージ ==========
-function acceptAI() {
-  document.getElementById('msgText').value = document.getElementById('aiText').textContent;
-  document.getElementById('aiSuggest').classList.add('hidden');
-  countChars();
-}
-function clearAI() {
-  document.getElementById('msgText').value = '';
-  document.getElementById('aiSuggest').classList.add('hidden');
-  countChars();
-}
-function countChars() {
-  document.getElementById('charCnt').textContent = document.getElementById('msgText').value.length;
-}
-
-// ========== リンク発行 ==========
-function issueLink() {
-  const msg = document.getElementById('msgText').value;
-  if (!msg.trim()) { alert('メッセージを入力してください'); return; }
-  // ランダムリンク生成
-  const token = Math.random().toString(36).substring(2, 12);
-  document.getElementById('linkBox').textContent = `https://kizashi.app/r/${token}`;
-  // 受取画面に反映
-  if (selectedCoupon !== null) {
-    const s = STORES[selectedCoupon];
-    document.getElementById('giftStore').textContent = s.name;
-    document.getElementById('giftDeal').textContent = s.deal;
-  }
-  document.getElementById('giftMsg').textContent = msg;
-  resetRedeem();
-  showView('link');
-}
-
-function copyLink() {
-  const text = document.getElementById('linkBox').textContent;
-  navigator.clipboard?.writeText(text).catch(()=>{});
-  const status = document.getElementById('copyStatus');
-  status.classList.add('show');
-  setTimeout(() => status.classList.remove('show'), 2000);
-}
-
-function copyAndOpen(type) {
-  copyLink();
-  alert(type === 'line'
-    ? 'リンクをコピーしました。LINEアプリが開いたら、お客様とのトークに貼り付けて送ってください。'
-    : 'リンクをコピーしました。SMSアプリが開いたら、お客様の番号に貼り付けて送ってください。');
-}
-
-function finishAndHome() {
-  alert('クーポンを発行しました。お客様に送信してください。');
-  showView('remind');
-}
-
-// ========== 完了スワイプ ==========
-function setupSwipe() {
-  const track = document.getElementById('swipeTrack');
-  const thumb = document.getElementById('swipeThumb');
-  const fill = document.getElementById('swipeFill');
-  const label = document.getElementById('swipeLabel');
-  if (!track) return;
-
-  let dragging = false;
-  let startX = 0;
-  let maxX = 0;
-
-  function getMax() { return track.offsetWidth - thumb.offsetWidth - 8; }
-
-  function start(e) {
-    dragging = true;
-    startX = (e.touches ? e.touches[0].clientX : e.clientX);
-    maxX = getMax();
-  }
-  function move(e) {
-    if (!dragging) return;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX);
-    let dx = x - startX;
-    dx = Math.max(0, Math.min(dx, maxX));
-    thumb.style.left = (4 + dx) + 'px';
-    fill.style.width = (56 + dx) + 'px';
-    if (dx >= maxX - 5) {
-      complete();
-    }
-  }
-  function end() {
-    if (!dragging) return;
-    dragging = false;
-    const cur = parseInt(thumb.style.left || '4');
-    if (cur < getMax() - 5) {
-      thumb.style.left = '4px';
-      fill.style.width = '56px';
-    }
-  }
-  function complete() {
-    dragging = false;
-    track.classList.add('swipe-done');
-    thumb.style.left = getMax() + 'px';
-    fill.style.width = '100%';
-    label.textContent = '✓ 利用完了';
-    setTimeout(() => {
-      document.getElementById('redeemActive').style.display = 'none';
-      document.getElementById('redeemUsed').style.display = 'block';
-    }, 400);
-  }
-
-  thumb.addEventListener('touchstart', start);
-  thumb.addEventListener('mousedown', start);
-  document.addEventListener('touchmove', move, { passive: true });
-  document.addEventListener('mousemove', move);
-  document.addEventListener('touchend', end);
-  document.addEventListener('mouseup', end);
-}
-
-function resetRedeem() {
-  document.getElementById('redeemActive').style.display = 'block';
-  document.getElementById('redeemUsed').style.display = 'none';
-  const track = document.getElementById('swipeTrack');
-  const thumb = document.getElementById('swipeThumb');
-  const fill = document.getElementById('swipeFill');
-  const label = document.getElementById('swipeLabel');
-  if (track) {
-    track.classList.remove('swipe-done');
-    thumb.style.left = '4px';
-    fill.style.width = '56px';
-    label.textContent = 'スワイプして利用';
-  }
-}
-
-// ========== 管理画面 ==========
-function adminTab(el, panel) {
+function couponTab(el, panel) {
   document.querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`panel-${panel}`).classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
 }
-
-function renderAdminStores() {
-  const list = document.getElementById('adminStoreList');
-  list.innerHTML = STORES.map(s => {
+function renderCouponUsage() {
+  const list = document.getElementById('couponUsageList');
+  list.innerHTML = STORES.map(function(s) {
     const rate = Math.round((s.used / s.issued) * 100);
-    return `
-    <div class="list-item">
-      <div class="list-icon coupon-icon ${CAT_CLASS[s.cat]}">${s.icon}</div>
-      <div class="list-info">
-        <div class="list-name">${s.name}</div>
-        <div class="list-detail">${AREA_NAMES[s.area]} · ${s.issued}件発行 ${s.used}件使用</div>
-        <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:${rate}%;"></div></div></div>
-      </div>
-      <span class="list-badge">${rate}%</span>
-    </div>`;
+    return '<div class="list-item"><div class="list-icon" style="background:' + CAT_BG[s.cat] + ';">' + s.icon + '</div><div class="list-info"><div class="list-name">' + s.name + '</div><div class="list-detail">' + AREA_NAMES[s.area] + ' · ' + s.deal + '</div><div class="list-detail">' + s.issued + '件発行 · ' + s.used + '件使用 · 未使用' + (s.issued - s.used) + '件</div><div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:' + rate + '%;"></div></div></div></div><span class="list-badge green">' + rate + '%</span></div>';
   }).join('');
 }
-
-// ========== 初期化 ==========
-initDateSelects();
-renderCoupons('all');
-renderAdminStores();
-setupSwipe();
+function addStore() {
+  const name = document.getElementById('storeName').value;
+  if (!name) { alert('店舗名を入力してください'); return; }
+  const cat = document.getElementById('storeCat').value;
+  const deal = document.getElementById('storeDeal').value || '内容未定';
+  STORES.push({ name: name, area: document.getElementById('storeArea').value, cat: cat, icon: ICONS[cat], deal: deal, issued: 0, used: 0 });
+  renderCouponUsage();
+  document.getElementById('storeName').value = '';
+  document.getElementById('storeDeal').value = '';
+  document.getElementById('storeNote').value = '';
+  document.getElementById('storeExpiry').value = '';
+  alert('「' + name + '」を登録しました');
+  document.querySelectorAll('.subtab')[0].classList.add('active');
+  document.querySelectorAll('.subtab')[1].classList.remove('active');
+  document.getElementById('panel-list').classList.add('active');
+  document.getElementById('panel-add').classList.remove('active');
+}
+function addSales() {
+  const name = document.getElementById('salesName').value;
+  if (!name) { alert('営業マン名を入力してください'); return; }
+  alert('「' + name + '」さんを追加しました（最大3名まで）');
+  document.getElementById('salesName').value = '';
+  document.getElementById('salesCompany').value = '';
+}
+renderCouponUsage();
 </script>
-
 </body>
 </html>
