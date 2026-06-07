@@ -983,75 +983,6 @@ textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
   </div>
 </section>
 
-<!-- ================================================ -->
-<!-- VIEW 7: 管理画面 -->
-<!-- ================================================ -->
-<section class="view" id="view-admin">
-  <div class="header">
-    <div class="header-top">
-      <h1>KIZASHI 管理</h1>
-      <span style="font-size:12px; color:var(--ink-tertiary);">🔐 運営</span>
-    </div>
-    <div class="header-sub">名古屋・岡崎パイロット</div>
-  </div>
-
-  <div class="card">
-    <div class="kpi-grid">
-      <div class="kpi-item"><div class="kpi-num">9</div><div class="kpi-label">🏪 加盟店</div></div>
-      <div class="kpi-item"><div class="kpi-num">3</div><div class="kpi-label">👥 営業マン</div></div>
-      <div class="kpi-item"><div class="kpi-num">23</div><div class="kpi-label">📊 今月利用</div></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="subtab-row">
-      <div class="subtab active" onclick="adminTab(this, 'sales')">営業マン</div>
-      <div class="subtab" onclick="adminTab(this, 'stores')">加盟店・クーポン</div>
-    </div>
-
-    <!-- 営業マン管理 -->
-    <div class="admin-panel active" id="panel-sales">
-      <div class="card-title">稼働率（クーポン使用率）</div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#007aff22;">山</div>
-        <div class="list-info">
-          <div class="list-name">山田 典広</div>
-          <div class="list-detail">今月 12件発行 · 9件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:75%;"></div></div></div>
-        </div>
-        <span class="list-badge">75%</span>
-      </div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#34c75922;">佐</div>
-        <div class="list-info">
-          <div class="list-name">佐藤 健一</div>
-          <div class="list-detail">今月 8件発行 · 5件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:63%;"></div></div></div>
-        </div>
-        <span class="list-badge">63%</span>
-      </div>
-      <div class="list-item">
-        <div class="list-icon" style="background:#ff950022;">鈴</div>
-        <div class="list-info">
-          <div class="list-name">鈴木 美咲</div>
-          <div class="list-detail">今月 5件発行 · 4件使用</div>
-          <div class="rate-bar-wrap"><div class="rate-bar-bg"><div class="rate-bar-fill" style="width:80%;"></div></div></div>
-        </div>
-        <span class="list-badge">80%</span>
-      </div>
-
-      <button class="btn btn-outline" style="margin-top:16px;" onclick="alert('営業マン追加フォーム（最大3名）')">+ 営業マンを追加</button>
-    </div>
-
-    <!-- 加盟店・クーポン管理 -->
-    <div class="admin-panel" id="panel-stores">
-      <div class="card-title">店舗ごとの使用率</div>
-      <div id="adminStoreList"></div>
-      <button class="btn btn-outline" style="margin-top:16px;" onclick="alert('店舗・クーポン登録フォーム')">+ 加盟店を登録</button>
-    </div>
-  </div>
-</section>
-
 <!-- ========== タブバー ========== -->
 <nav class="tab-bar hidden" id="tabBar">
   <button class="tab-item" onclick="showView('remind')" id="tab-remind">
@@ -1062,9 +993,6 @@ textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
   </button>
   <button class="tab-item" onclick="showView('redeem')" id="tab-redeem">
     <span class="tab-icon">🎁</span>受取画面
-  </button>
-  <button class="tab-item" onclick="showView('admin')" id="tab-admin">
-    <span class="tab-icon">⚙️</span>管理
   </button>
 </nav>
 
@@ -1348,7 +1276,6 @@ function renderAdminStores() {
 // ========== 初期化 ==========
 initDateSelects();
 renderCoupons('all');
-renderAdminStores();
 setupSwipe();
 </script>
 
