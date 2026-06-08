@@ -221,6 +221,7 @@ textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -337,12 +338,12 @@ textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
   <div class="card">
     <div class="card-title">リマインド設定</div>
     <div class="remind-heading"><span>🔄</span> 継続記念日（毎年）</div>
-    <div class="remind-row"><div class="remind-label">誕生日</div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
-    <div class="remind-row"><div class="remind-label">結婚記念日</div><label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label></div>
-    <div class="remind-row"><div class="remind-label">開業記念日</div><label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label></div>
+    <div class="remind-row"><div class="remind-label">誕生日</div><label class="toggle"><input type="checkbox" id="remBirthday" checked><span class="toggle-track"></span></label></div>
+    <div class="remind-row"><div class="remind-label">結婚記念日</div><label class="toggle"><input type="checkbox" id="remAnniversary"><span class="toggle-track"></span></label></div>
+    <div class="remind-row"><div class="remind-label">開業記念日</div><label class="toggle"><input type="checkbox" id="remOpening"><span class="toggle-track"></span></label></div>
     <div class="remind-heading"><span>🎓</span> 単発記念日（自動計算）</div>
-    <div class="remind-row"><div><div class="remind-label">入学・卒業</div><div class="remind-desc">生年月日から自動判定</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
-    <div class="remind-row"><div><div class="remind-label">成人</div><div class="remind-desc">18歳到達時に通知</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
+    <div class="remind-row"><div><div class="remind-label">入学・卒業</div><div class="remind-desc">生年月日から自動判定</div></div><label class="toggle"><input type="checkbox" id="remSchool" checked><span class="toggle-track"></span></label></div>
+    <div class="remind-row"><div><div class="remind-label">成人</div><div class="remind-desc">18歳到達時に通知</div></div><label class="toggle"><input type="checkbox" id="remAdult" checked><span class="toggle-track"></span></label></div>
   </div>
 
   <div style="padding: 0 16px; margin-bottom: 16px;">
@@ -482,6 +483,14 @@ textarea.field { min-height: 90px; resize: vertical; line-height: 1.6; }
 </div>
 
 <script>
+// ===== Supabase 接続設定 =====
+const SUPABASE_URL = 'https://xmmiaevyosbhpbgmgrak.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_48a8BV-m5jlcaqhzZwI_ZQ_VXH4sPAH';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// 今は山田さん1名。ログイン分離は後の段階で実装。
+const CURRENT_REP = 'yamada';
+// ============================
+
 const STORES = [
   { name: '栄フォトスタジオ LUMIÈRE', area: 'owari', cat: 'photo', icon: '📸', deal: '入学記念撮影 10% OFF', note: '入学式前後2週間以内のご来店で適用' },
   { name: '名駅イタリアン FESTA', area: 'owari', cat: 'food', icon: '🍽️', deal: 'お祝いデザートプレート 無料プレゼント', note: '2名様以上のご予約でご利用可能' },
@@ -544,24 +553,85 @@ function initDateSelects() {
   for (let i = 1; i <= 31; i++) d.innerHTML += `<option value="${i}">${i}日</option>`;
 }
 
-function renderCustomers() {
+async function renderCustomers() {
   const list = document.getElementById('customerList');
-  list.innerHTML = CUSTOMERS.map(c => `
+  list.innerHTML = '<div class="customer-detail" style="padding:14px 0;">読み込み中…</div>';
+
+  const { data, error } = await sb
+    .from('customers')
+    .select('*')
+    .eq('sales_rep', CURRENT_REP)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = `<div class="customer-detail" style="padding:14px 0;color:var(--red);">読み込みに失敗しました（${error.message}）</div>`;
+    return;
+  }
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div class="customer-detail" style="padding:14px 0;">まだ顧客が登録されていません</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(c => {
+    const rem = [];
+    if (c.remind_birthday) rem.push('誕生日');
+    if (c.remind_anniversary) rem.push('結婚記念日');
+    if (c.remind_opening) rem.push('開業記念日');
+    if (c.remind_school) rem.push('入学/卒業');
+    if (c.remind_adult) rem.push('成人');
+    const remText = rem.length ? rem.join('・') : '通知なし';
+    return `
     <div class="customer-item">
-      <div class="customer-id">${c.id}</div>
+      <div class="customer-id">${c.customer_code}</div>
       <div class="customer-info">
-        <div class="customer-name">顧客ID: ${c.id}（${c.target}）</div>
-        <div class="customer-detail">生年月日 ${c.birth} · ${c.remind}</div>
+        <div class="customer-name">顧客ID: ${c.customer_code}（${c.target || '本人'}）</div>
+        <div class="customer-detail">生年月日 ${c.birth_date} · ${remText}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function registerCustomer() {
-  const id = document.getElementById('custId').value;
+async function registerCustomer() {
+  const id = document.getElementById('custId').value.trim();
   const y = document.getElementById('birthYear').value;
-  if (!id || !y) { alert('顧客IDと生年月日を入力してください'); return; }
+  const m = document.getElementById('birthMonth').value;
+  const d = document.getElementById('birthDay').value;
+  if (!id || !y || !m || !d) { alert('顧客IDと生年月日（年・月・日）を入力してください'); return; }
+
+  // 生年月日を YYYY-MM-DD 形式に整える
+  const birthDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+  // 選択中の対象
+  const targetEl = document.querySelector('#targetGrid .target-chip.selected');
+  const target = targetEl ? targetEl.textContent.trim() : '本人';
+
+  const btn = document.querySelector('#view-input .btn-primary');
+  const orig = btn.textContent;
+  btn.textContent = '保存中…';
+  btn.disabled = true;
+
+  const { error } = await sb.from('customers').insert({
+    customer_code: id,
+    birth_date: birthDate,
+    sales_rep: CURRENT_REP,
+    target: target,
+    remind_birthday: document.getElementById('remBirthday').checked,
+    remind_anniversary: document.getElementById('remAnniversary').checked,
+    remind_opening: document.getElementById('remOpening').checked,
+    remind_school: document.getElementById('remSchool').checked,
+    remind_adult: document.getElementById('remAdult').checked
+  });
+
+  btn.textContent = orig;
+  btn.disabled = false;
+
+  if (error) {
+    alert('保存に失敗しました：' + error.message);
+    return;
+  }
   alert(`顧客ID「${id}」を登録しました`);
   document.getElementById('custId').value = '';
+  await renderCustomers();
   showView('customers');
 }
 
